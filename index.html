@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Syah">
+    <meta name="copyright" content="© 2025 Syah. All rights reserved.">
+    <title>Digital Image Processing Tool - Aplikasi Penelitian</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1>Digital Image Processing Tool</h1>
+            <p class="subtitle">Aplikasi Pre-processing & Segmentasi Citra Digital Berbasis Web</p>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar Controls -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h2>📁 Akuisisi Citra</h2>
+                <div class="upload-area" id="uploadArea">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p>Drag & Drop gambar atau klik untuk upload</p>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                </div>
+                <button class="btn btn-secondary" id="resetBtn" disabled>Reset ke Citra Awal</button>
+                
+                <div class="image-info" id="imageInfo" style="display: none;">
+                    <h3>Informasi Citra</h3>
+                    <p><strong>Resolusi:</strong> <span id="infoResolution">-</span></p>
+                    <p><strong>Ukuran File:</strong> <span id="infoSize">-</span></p>
+                    <p><strong>Format:</strong> <span id="infoFormat">-</span></p>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h2>🔧 Pre-processing</h2>
+                
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="grayscaleCheck"> Konversi Grayscale
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <label for="brightnessSlider">Brightness: <span id="brightnessValue">0</span></label>
+                    <input type="range" id="brightnessSlider" min="-100" max="100" value="0" step="1">
+                </div>
+
+                <div class="control-group">
+                    <label for="contrastSlider">Contrast: <span id="contrastValue">1.0</span></label>
+                    <input type="range" id="contrastSlider" min="0.5" max="3" value="1" step="0.1">
+                </div>
+
+                <div class="control-group">
+                    <label for="blurSlider">Gaussian Blur: <span id="blurValue">0</span> px</label>
+                    <input type="range" id="blurSlider" min="0" max="20" value="0" step="1">
+                </div>
+
+                <div class="control-group">
+                    <label for="medianSlider">Median Filter: <span id="medianValue">0</span></label>
+                    <input type="range" id="medianSlider" min="0" max="9" value="0" step="2">
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="histEqCheck"> Histogram Equalization
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="normalizeCheck"> Normalisasi Intensitas
+                    </label>
+                </div>
+
+                <div class="control-group">
+                    <label for="scaleSlider">Resize: <span id="scaleValue">100</span>%</label>
+                    <input type="range" id="scaleSlider" min="25" max="200" value="100" step="25">
+                </div>
+
+                <button class="btn btn-primary" id="applyPreprocessBtn" disabled>Terapkan Pre-processing</button>
+            </div>
+
+            <div class="sidebar-section">
+                <h2>✂️ Segmentasi</h2>
+                
+                <div class="control-group">
+                    <label for="segmentMethod">Metode Segmentasi:</label>
+                    <select id="segmentMethod">
+                        <option value="">-- Pilih Metode --</option>
+                        <optgroup label="Thresholding">
+                            <option value="global">Global Threshold</option>
+                            <option value="otsu">Otsu Threshold</option>
+                            <option value="adaptive">Adaptive Threshold</option>
+                        </optgroup>
+                        <optgroup label="Edge Detection">
+                            <option value="sobel">Sobel Edge</option>
+                            <option value="canny">Canny Edge</option>
+                        </optgroup>
+                        <optgroup label="Clustering">
+                            <option value="kmeans">K-Means Segmentation</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="control-group" id="thresholdControl" style="display: none;">
+                    <label for="thresholdSlider">Threshold: <span id="thresholdValue">128</span></label>
+                    <input type="range" id="thresholdSlider" min="0" max="255" value="128" step="1">
+                </div>
+
+                <div class="control-group" id="cannyControl" style="display: none;">
+                    <label for="cannyLowSlider">Low Threshold: <span id="cannyLowValue">50</span></label>
+                    <input type="range" id="cannyLowSlider" min="0" max="255" value="50" step="5">
+                    
+                    <label for="cannyHighSlider">High Threshold: <span id="cannyHighValue">150</span></label>
+                    <input type="range" id="cannyHighSlider" min="0" max="255" value="150" step="5">
+                </div>
+
+                <div class="control-group" id="kmeansControl" style="display: none;">
+                    <label for="kmeansSlider">Jumlah Cluster (K): <span id="kmeansValue">3</span></label>
+                    <input type="range" id="kmeansSlider" min="2" max="8" value="3" step="1">
+                </div>
+
+                <button class="btn btn-primary" id="applySegmentBtn" disabled>Terapkan Segmentasi</button>
+            </div>
+
+            <div class="sidebar-section">
+                <h2>💾 Ekspor Hasil</h2>
+                <button class="btn btn-success" id="downloadBtn" disabled>Download Hasil (PNG)</button>
+                <button class="btn btn-success" id="downloadAllBtn" disabled>Download Semua Tahap (ZIP)</button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <div class="workspace-header">
+                <div class="view-toggle">
+                    <button class="toggle-btn active" data-view="split">Split View</button>
+                    <button class="toggle-btn" data-view="before">Before Only</button>
+                    <button class="toggle-btn" data-view="after">After Only</button>
+                    <button class="toggle-btn" data-view="overlay">Overlay</button>
+                </div>
+            </div>
+
+            <div class="canvas-container" id="canvasContainer">
+                <div class="canvas-wrapper" id="beforeWrapper">
+                    <h3>Citra Asli</h3>
+                    <canvas id="originalCanvas"></canvas>
+                </div>
+                <div class="canvas-wrapper" id="afterWrapper">
+                    <h3>Hasil Pemrosesan</h3>
+                    <canvas id="processedCanvas"></canvas>
+                </div>
+            </div>
+
+            <div class="histogram-container">
+                <div class="histogram-box">
+                    <h3>Histogram Citra Asli</h3>
+                    <canvas id="histogramOriginal"></canvas>
+                </div>
+                <div class="histogram-box">
+                    <h3>Histogram Hasil</h3>
+                    <canvas id="histogramProcessed"></canvas>
+                </div>
+            </div>
+
+            <div class="process-log" id="processLog">
+                <h3>Log Pemrosesan</h3>
+                <div id="logContent"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>© 2025 <strong>Syah</strong>. All rights reserved.</p>
+            <p class="footer-subtitle">Digital Image Processing Tool - Aplikasi Penelitian Skripsi</p>
+        </div>
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Memproses citra...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+</body>
+</html>
